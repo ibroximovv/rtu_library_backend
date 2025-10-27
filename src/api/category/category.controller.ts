@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Request } from 'express';
 import { AuthBranchGuard } from 'src/guard/auth-branch/auth-branch.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -18,8 +19,8 @@ export class CategoryController {
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.categoryService.findAll(query);
   }
 
   @Get(':id')

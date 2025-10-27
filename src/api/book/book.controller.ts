@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Request } from 'express';
 import { AuthBranchGuard } from 'src/guard/auth-branch/auth-branch.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 @Controller('book')
 export class BookController {
@@ -18,8 +19,8 @@ export class BookController {
   }
 
   @Get()
-  findAll() {
-    return this.bookService.findAll();
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.bookService.findAll(query);
   }
 
   @Get(':id')

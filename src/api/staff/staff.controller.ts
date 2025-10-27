@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { StaffService } from './staff.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { AuthBranchGuard } from 'src/guard/auth-branch/auth-branch.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 @Controller('staff')
 export class StaffController {
@@ -17,8 +18,8 @@ export class StaffController {
   }
 
   @Get()
-  findAll() {
-    return this.staffService.findAll();
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.staffService.findAll(query);
   }
 
   @Get(':id')
