@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Branches {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  address    String
+  login      String
+  password   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Book       Book[]
+  Category   Category[]
+  Staff      Staff[]
+  toRentBook toRentBook[]
+}
+
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  branch     Branches @relation(fields: [branchesId], references: [id])
+  branchesId Int
+  qrCode     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  Book       Book[]
+
+  @@index([branchesId])
+}
+
+model Book {
+  id               Int          @id @default(autoincrement())
+  name             String       @unique
+  author           String?
+  quantity         Int
+  qrCode           String?
+  category         Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId       Int
+  branch           Branches     @relation(fields: [branchesId], references: [id])
+  branchesId       Int
+  numberOfReadings Int?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  toRentBook       toRentBook[]
+
+  @@index([branchesId])
+}
+
+model Students {
+  id               Int                  @id @default(autoincrement())
+  fullName         String
+  password         String
+  courseNumber     courseNumberEnum?
+  groupNumber      String
+  phoneNumber      String
+  telegramUserName String?
+  telegramUserId   String?
+  formOfEducation  formOfEducationEnum?
+  email            String?
+  qrCode           String?
+  numberOfBooks    Int?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  toRentBook       toRentBook[]
+}
+
+enum courseNumberEnum {
+  COURSE1
+  COURSE2
+  COURSE3
+  COURSE4
+  COURSE5
+}
+
+enum formOfEducationEnum {
+  DAYTIME
+  EVENING
+  PARTTIME
+  ONLINE
+}
+
+model Staff {
+  id               Int          @id @default(autoincrement())
+  fullName         String       @unique
+  password         String
+  phoneNumber      String
+  telegramUserName String?
+  telegramUserId   String?
+  email            String?
+  qrCode           String?
+  branch           Branches     @relation(fields: [branchesId], references: [id])
+  branchesId       Int
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  toRentBook       toRentBook[]
+
+  @@index([branchesId])
+}
+
+model toRentBook {
+  id         Int                    @id @default(autoincrement())
+  book       Book                   @relation(fields: [bookId], references: [id])
+  bookId     Int
+  student    Students?              @relation(fields: [studentsId], references: [id])
+  studentsId Int?
+  staff      Staff?                 @relation(fields: [staffId], references: [id])
+  staffId    Int?
+  quantity   Int                    @default(1)
+  qrCode     String?
+  branch     Branches               @relation(fields: [branchesId], references: [id])
+  deadline   toRentBookDeadlineEnum @default(MONTH1)
+  status     toRentBookStatusEnum   @default(RENTED)
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+  branchesId Int
+
+  @@index([bookId, studentsId, staffId])
+}
+
+enum toRentBookStatusEnum {
+  PENDING
+  RENTED
+  RETURNED
+  MUSTBERETURNED
+}
+
+enum toRentBookDeadlineEnum {
+  WEEK1
+  WEEK2
+  WEEK3
+  WEEK4
+  MONTH1
+  MONTH2
+  MONTH3
+}
